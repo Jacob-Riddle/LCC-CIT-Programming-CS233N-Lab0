@@ -70,21 +70,52 @@ namespace TicTacToe
         //* TODO:  finish all of these that return true
         private bool IsAnyRowWinner()
         {
-            return true;
+            bool isWin = false;
+            for (int i = 0; i < SIZE; i++)
+            {
+                isWin = IsRowWinner(i);
+            }
+
+            return isWin;
         }
 
         private bool IsColumnWinner(int col)
         {
+            Label square = GetSquare(0, col);
+            string symbol = square.Text;
+            for (int row = 1; row < SIZE; row++);
+            {
+                square = GetSquare(0, col);
+                if (symbol == EMPTY || square.Text != symbol)
+                {
+                    return false;
+                }
+            }
+
             return true;
         }
 
         private bool IsAnyColumnWinner()
         {
-            return true;
+            bool isWin = false;
+            for (int i = 0; i < SIZE; i++)
+            {
+                isWin = IsColumnWinner(i);
+            }
+
+            return isWin;
         }
 
         private bool IsDiagonal1Winner()
         {
+            Label square = GetSquare(0, 0);
+            string symbol = square.Text;
+            for (int row = 1, col = 1; row < SIZE; row++, col++)
+            {
+                square = GetSquare(row, col);
+                if (symbol == EMPTY || square.Text != symbol)
+                    return false;
+            }
             return true;
         }
 
@@ -103,12 +134,36 @@ namespace TicTacToe
 
         private bool IsAnyDiagonalWinner()
         {
-            return true;
+            if (IsDiagonal1Winner() || IsDiagonal2Winner())
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private bool IsFull()
         {
-            return true;
+            int count = 0;
+            for (int row = 0; row < SIZE; row++)
+            {
+                for (int col = 0; col < SIZE; col++)
+                {
+                    Label square = GetSquare(row, col);
+                    
+                    if (square.Text == USER_SYMBOL || square.Text == COMPUTER_SYMBOL)
+                    {
+                        count++;
+                    }
+                }
+            }
+
+            if (count == SIZE * SIZE)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         // This method determines if any row, column or diagonal on the board is a winner.
