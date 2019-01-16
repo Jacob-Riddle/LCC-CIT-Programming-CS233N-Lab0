@@ -21,6 +21,15 @@ namespace TicTacToe
         const string COMPUTER_SYMBOL = "O";
         const string EMPTY = "";
 
+        enum Player
+        {
+            Computer,
+            Player
+        }
+
+        // Track current Player
+        private Player current;
+
         const int SIZE = 5;
 
         // constants for the 2 diagonals
@@ -32,6 +41,7 @@ namespace TicTacToe
         const int ROW = 1;
         const int COLUMN = 2;
         const int DIAGONAL = 3;
+
 
         // This method takes a row and column as parameters and 
         // returns a reference to a label on the form in that position
@@ -83,9 +93,9 @@ namespace TicTacToe
         {
             Label square = GetSquare(0, col);
             string symbol = square.Text;
-            for (int row = 1; row < SIZE; row++);
+            for (int row = 1; row < SIZE; row++)
             {
-                square = GetSquare(0, col);
+                square = GetSquare(row, col);
                 if (symbol == EMPTY || square.Text != symbol)
                 {
                     return false;
@@ -151,14 +161,14 @@ namespace TicTacToe
                 {
                     Label square = GetSquare(row, col);
                     
-                    if (square.Text == USER_SYMBOL || square.Text == COMPUTER_SYMBOL)
+                    if (square.Text != EMPTY)
                     {
                         count++;
                     }
                 }
             }
 
-            if (count == SIZE * SIZE)
+            if (count >= SIZE * SIZE)
             {
                 return true;
             }
@@ -253,10 +263,22 @@ namespace TicTacToe
         //* TODO:  finish these 2
         private void HighlightRow(int row)
         {
+            for (int col = 0; col < SIZE; col++)
+            {
+                Label square = GetSquare(row, col);
+                square.Enabled = true;
+                square.ForeColor = Color.Red;
+            }
         }
 
         private void HighlightDiagonal1()
         {
+            for (int row = 0, col = 0; row < SIZE; row++, col++)
+            {
+                Label square = GetSquare(row, col);
+                square.Enabled = true;
+                square.ForeColor = Color.Red;
+            }
         }
 
         //* TODO:  finish this
@@ -265,10 +287,12 @@ namespace TicTacToe
             switch (winningDimension)
             {
                 case ROW:
-
+                    HighlightRow(winningValue);
+                    resultLabel.Text = (player + "wins!");
                     break;
                 case COLUMN:
-
+                    HighlightColumn(winningValue);
+                    resultLabel.Text = (player + "wins!");
                     break;
                 case DIAGONAL:
                     HighlightDiagonal(winningValue);
@@ -280,10 +304,37 @@ namespace TicTacToe
         //* TODO:  finish these 2
         private void ResetSquares()
         {
+            for (int row = 0; row < SIZE; row++)
+            {
+                for (int col = 0; col < SIZE; col++)
+                {
+                    Label square = GetSquare(row, col);
+
+                    square.Text = EMPTY;
+                    square.ForeColor = Color.Black;
+                }
+            }
         }
 
         private void MakeComputerMove()
         {
+            Random rnd = new Random();
+            current = Player.Computer;
+
+            for (int row = 0; row < SIZE; row++)
+            { 
+                for (int col = 0; col < SIZE; col++)
+                {
+                    Label square = GetSquare(row, col);
+
+                    if (square.Text == EMPTY && rnd.Next() % 2 == 0)
+                    {
+                        square.Text = COMPUTER_SYMBOL;
+                        DisableSquare(square);
+                        return;
+                    }
+                }     
+            }
         }
 
         // Setting the enabled property changes the look and feel of the cell.
@@ -324,19 +375,46 @@ namespace TicTacToe
         //* TODO:  finish the event handlers
         private void label_Click(object sender, EventArgs e)
         {
+            current = Player.Player;
             int winningDimension = NONE;
             int winningValue = NONE;
 
             Label clickedLabel = (Label)sender;
 
+            clickedLabel.Text = USER_SYMBOL;
+            DisableSquare(clickedLabel);
+
+            // Check for tie or win, then again after the computer moves
+            for (int i = 0; i < 2; i++)
+            {
+                if (IsWinner(out winningDimension, out winningValue))
+                {
+                    HighlightWinner(current.ToString() + " ", winningDimension, winningValue);
+                    DisableAllSquares();
+                }
+                else if (IsTie())
+                {
+                    DisableAllSquares();
+                    resultLabel.Text = ("Everyone loses!");
+                }
+                else if (current != Player.Computer)
+                {
+                    MakeComputerMove();
+                }
+            }
         }
 
-        private void newGameButton_Click(object sender, EventArgs e)
+            private void newGameButton_Click(object sender, EventArgs e)
         {
+            DisableAllSquares();
+            EnableAllSquares();
+            ResetSquares();
+            resultLabel.Text = ("");
         }
 
         private void exitButton_Click(object sender, EventArgs e)
         {
+            Application.Exit();
         }
     }
 }
