@@ -18,6 +18,7 @@ namespace Memory
         }
 
         #region Instance Variables
+        const int NUMCARDS = 20;
         const int NOT_PICKED_YET = -1;
 
         int firstCardNumber = NOT_PICKED_YET;
@@ -68,7 +69,12 @@ namespace Memory
         // TODO:  students should write this one
         private bool IsMatch(int index1, int index2)
         {
-            return true;
+            if (GetCardValue(index1) == GetCardValue(index2))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         // This method fills each picture box with a filename
@@ -91,6 +97,14 @@ namespace Memory
         // TODO:  students should write this one
         private void ShuffleCards()
         {
+            for (int i = 1; i <= NUMCARDS; i++)
+            {
+                Random rand = new Random();
+                int swap = rand.Next(1, NUMCARDS);
+                String temp = GetCardFilename(i);
+                SetCardFilename(i, GetCardFilename(swap));
+                SetCardFilename(swap, temp);
+            }
         }
 
         // This method loads (shows) an image in a picture box.  Assumes that filenames
@@ -112,55 +126,72 @@ namespace Memory
         // shows (loads) the backs of all of the cards
         private void LoadAllCardBacks()
         {
-
+            for (int i = 1; i <= NUMCARDS; i++)
+            {
+                LoadCardBack(i);
+            }
         }
 
         // Hides a picture box
         private void HideCard(int i)
         {
-
+            LoadCardBack(i);
         }
 
         private void HideAllCards()
         {
-
+            LoadAllCardBacks();
         }
 
         // shows a picture box
         private void ShowCard(int i)
         {
-
+            LoadCard(i);
         }
 
         private void ShowAllCards()
         {
-
+            for (int i = 1; i <= NUMCARDS; i++)
+            {
+                LoadCard(i);
+            }
         }
 
         // disables a picture box
         private void DisableCard(int i)
         {
-
+            PictureBox card = GetCard(i);
+            card.Click -= new System.EventHandler(this.card_Click);
         }
 
         private void DisableAllCards()
         {
-
+            for (int i = 0; i <= NUMCARDS; i++)
+            {
+                DisableCard(i);
+            }
         }
 
         private void EnableCard(int i)
         {
-
+            PictureBox card = GetCard(i);
+            card.Click += new System.EventHandler(this.card_Click);
         }
 
         private void EnableAllCards()
         {
-
+            for (int i = 1; i <= NUMCARDS; i++)
+            {
+                EnableCard(i);
+            }
         }
     
         private void EnableAllVisibleCards()
         {
-
+            for (int i = 0; i <= NUMCARDS; i++)
+            {
+            
+            }
         }
 
         #endregion
@@ -176,6 +207,10 @@ namespace Memory
              *      to make sure that the cards are loaded successfully and that
              *      they're shuffled.  If you get all 2s, something is wrong.
             */
+
+            FillCardFilenames();
+            ShuffleCards();
+            LoadAllCardBacks();
         }
 
         private void card_Click(object sender, EventArgs e)
@@ -195,6 +230,20 @@ namespace Memory
              *      start the flip timer
              *  end if
             */
+
+            if (firstCardNumber == NOT_PICKED_YET)
+            {
+                firstCardNumber = cardNumber;
+                LoadCard(firstCardNumber);
+                DisableCard(firstCardNumber);
+            }
+            else if (secondCardNumber == NOT_PICKED_YET)
+            {
+                secondCardNumber = cardNumber;
+                LoadCard(secondCardNumber);
+                DisableCard(secondCardNumber);
+            }
+
         }
 
         private void flipTimer_Tick(object sender, EventArgs e)
