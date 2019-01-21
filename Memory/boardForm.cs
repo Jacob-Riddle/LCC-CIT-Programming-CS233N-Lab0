@@ -135,7 +135,8 @@ namespace Memory
         // Hides a picture box
         private void HideCard(int i)
         {
-            LoadCardBack(i);
+            PictureBox card = GetCard(i);
+            card.Visible = false;
         }
 
         private void HideAllCards()
@@ -146,14 +147,15 @@ namespace Memory
         // shows a picture box
         private void ShowCard(int i)
         {
-            LoadCard(i);
+            PictureBox card = GetCard(i);
+            card.Visible = true;
         }
 
         private void ShowAllCards()
         {
             for (int i = 1; i <= NUMCARDS; i++)
             {
-                LoadCard(i);
+                ShowCard(i);
             }
         }
 
@@ -166,7 +168,7 @@ namespace Memory
 
         private void DisableAllCards()
         {
-            for (int i = 0; i <= NUMCARDS; i++)
+            for (int i = 1; i <= NUMCARDS; i++)
             {
                 DisableCard(i);
             }
@@ -188,9 +190,14 @@ namespace Memory
     
         private void EnableAllVisibleCards()
         {
-            for (int i = 0; i <= NUMCARDS; i++)
+            for (int i = 1; i <= NUMCARDS; i++)
             {
-            
+                PictureBox card = GetCard(i);
+
+                if (card.Visible == true)
+                {
+                    EnableCard(i);
+                }
             }
         }
 
@@ -241,9 +248,9 @@ namespace Memory
             {
                 secondCardNumber = cardNumber;
                 LoadCard(secondCardNumber);
-                DisableCard(secondCardNumber);
+                DisableAllCards();
+                flipTimer.Start();
             }
-
         }
 
         private void flipTimer_Tick(object sender, EventArgs e)
@@ -269,6 +276,33 @@ namespace Memory
              *      enable all of the cards left on the board
              * end if
              */
+            flipTimer.Stop();
+            
+            if (GetCardValue(firstCardNumber) == GetCardValue(secondCardNumber))
+            {
+                matches++;
+                HideCard(firstCardNumber);
+                HideCard(secondCardNumber);
+                firstCardNumber = NOT_PICKED_YET;
+                secondCardNumber = NOT_PICKED_YET;
+                
+                if (matches == 10)
+                {
+                    MessageBox.Show("You Won!", "Congratulations");
+                }
+                else
+                {
+                    EnableAllVisibleCards();
+                }
+            }
+            else
+            {
+                LoadCardBack(firstCardNumber);
+                LoadCardBack(secondCardNumber);
+                firstCardNumber = NOT_PICKED_YET;
+                secondCardNumber = NOT_PICKED_YET;
+                EnableAllVisibleCards();
+            }
         }
         #endregion
     }
